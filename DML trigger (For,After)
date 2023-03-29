@@ -1,0 +1,77 @@
+ -- Create trigger on table employee for Insert statement
+select * from employee
+select * from employee_Audit
+
+drop trigger trigg_after_delete
+---------------audit table
+create table employee_Audit
+(
+ Emp_ID int,
+ Emp_Name varchar(55),
+ Emp_Sal decimal(10,2),
+ Audit_Action varchar(100),
+ Audit_Timestamp datetime
+) 
+
+CREATE TRIGGER trigg_after_insert on employee
+AFTER INSERT
+AS declare @empid int, @empname varchar(55),@empdep varchar(20), @empsal decimal(10,2), @audit_action varchar(100);
+select @empid =i.id from inserted i;
+select @empname=i.name from inserted i;
+select @empdep=i.department from inserted i;
+select @empsal=i.salary from inserted i;
+set @audit_action='Kisi ne data insert kiya'; 
+insert into employee_Audit(Emp_ID,Emp_Name,Emp_Sal,Audit_Action,Audit_Timestamp)
+values (@empid,@empname,@empsal,@audit_action,getdate());
+PRINT 'AFTER INSERT trigger fired.'
+--Output will be 
+
+-------------------insert record to verify ----
+insert into employee values(1,'Madan','Digital',8342)
+select * from employee
+select * from employee_Audit
+
+----------------------update record ------
+create TRIGGER trigg_after_update on employee
+AFTER UPDATE
+AS declare @empid int, @empname varchar(55),@empdep varchar(20), @empsal decimal(10,2), @audit_action varchar(100);
+select @empid =i.id from inserted i;
+select @empname=i.name from inserted i;
+select @empdep=i.department from inserted i;
+select @empsal=i.salary from inserted i;
+set @audit_action='UPDATE Record -- After update Trigger.'; 
+if update (salary)
+set @audit_action='Update Record --- After Update Trigger.';
+insert into employee_Audit(Emp_ID,Emp_Name,Emp_Sal,Audit_Action,Audit_Timestamp)
+values (@empid,@empname,@empsal,@audit_action,getdate());
+PRINT 'AFTER UPDATE trigger fired'
+--Output will be 
+
+update employee
+set salary =8800
+where name ='Mithun'
+
+
+select * from employee_Audit
+select * from employee
+
+delete from employee_Audit where Emp_Name is null
+
+----------------------delete record ------
+CREATE TRIGGER trigg_after_delete ON employee
+FOR DELETE
+AS
+declare @empid int, @empname varchar(55), @empsal decimal(10,2), @audit_action varchar(100); 
+select @empid=d.id FROM deleted d;
+select @empname=d.name from deleted d;
+select @empsal=d.salary from deleted d;
+select @audit_action='Deleted -- After Delete Trigger.';
+insert into employee_Audit (Emp_ID,Emp_Name,Emp_Sal,Audit_Action,Audit_Timestamp)
+values (@empid,@empname,@empsal,@audit_action,getdate());
+PRINT 'AFTER DELETE TRIGGER fired.'
+--Output will be
+
+-------------
+select * from employee
+delete from employee where name ='Madan'
+select * from employee_Audit
